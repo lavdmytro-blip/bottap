@@ -10,7 +10,7 @@ from psycopg.types.json import Jsonb
 
 logging.basicConfig(level=logging.INFO)
 log = logging.getLogger('popov')
-TOKEN = os.getenv('BOT_TOKEN', '')
+TOKEN = os.getenv('BOT_TOKEN', '').strip()
 DATABASE_URL = os.getenv('DATABASE_URL', '')
 PUBLIC_URL = os.getenv('PUBLIC_URL', '').strip().rstrip('/')
 BOT_USERNAME = os.getenv('BOT_USERNAME', 'popov_tap_game_bot').strip().lstrip('@')
