@@ -9,6 +9,7 @@ from fastapi.responses import FileResponse, JSONResponse
 from psycopg.types.json import Jsonb
 
 logging.basicConfig(level=logging.INFO)
+logging.getLogger('httpx').setLevel(logging.WARNING)  # avoid logging Bot API URLs containing secrets
 log = logging.getLogger('popov')
 TOKEN = os.getenv('BOT_TOKEN', '').strip()
 DATABASE_URL = os.getenv('DATABASE_URL', '')
@@ -64,7 +65,7 @@ def telegram_user(init_data):
     try:
         pairs=dict(parse_qsl(init_data,keep_blank_values=True))
         expected=pairs.pop('hash','')
-        pairs.pop('signature',None)
+        # Include 'signature' in bot-token HMAC validation; only 'hash' is excluded.
         auth=int(pairs.get('auth_date','0'))
         if not expected or abs(time.time()-auth)>86400: raise ValueError('Telegram authorization expired')
         check='\n'.join(f'{key}={value}' for key,value in sorted(pairs.items()))
