@@ -142,7 +142,7 @@ async def polling():
                                 'photo_url': ''
                             }
                             persist()
-                        await telegram('sendMessage', {'chat_id': sender, 'text': '👑 ADMIN TEST: 1 000 000 000 POPOV POINTS, все скины, улучшения 25 уровня. Тестовый аккаунт исключён из общего рейтинга.'})
+                        await telegram('sendMessage', {'chat_id': sender, 'text': '👑 ADMIN TEST: 1 000 000 000 POPOV POINTS, все скины, улучшения 25 уровня. Админ-аккаунт участвует в рейтинге с пометкой ADMIN (тестовые начисления).'})
                     else:
                         await telegram('sendMessage', {'chat_id': msg['chat']['id'], 'text': 'Команда недоступна.'})
                     continue
@@ -243,9 +243,9 @@ async def api(action:str,request:Request):
             if key not in REWARDS or key in p['claimed'] or p['totalTaps']<int(key): fail('Reward unavailable')
             p['balance']+=REWARDS[key];p['claimed'].append(key)
         elif action=='leaderboard':
-            ranked=sorted(({'uid':id,'score':int(max(0,x['balance'])),'username':x.get('profile',{}).get('username',''),'name':x.get('profile',{}).get('name','Игрок POPOV'),'photo_url':x.get('profile',{}).get('photo_url','')} for id,x in state['users'].items() if not x.get('admin_test')),key=lambda x:(-x['score'],x['uid']))
+            ranked=sorted(({'uid':id,'score':int(max(0,x['balance'])),'username':x.get('profile',{}).get('username',''),'name':x.get('profile',{}).get('name','Игрок POPOV'),'photo_url':x.get('profile',{}).get('photo_url',''),'isAdmin':bool(x.get('admin_test'))} for id,x in state['users'].items()),key=lambda x:(-x['score'],x['uid']))
             my_rank=next((i+1 for i,x in enumerate(ranked) if x['uid']==uid),0)
-            top=[{'rank':i+1,'score':x['score'],'username':x['username'],'name':x['name'],'photo_url':x['photo_url'],'isMe':x['uid']==uid} for i,x in enumerate(ranked[:100])]
+            top=[{'rank':i+1,'score':x['score'],'username':x['username'],'name':x['name'],'photo_url':x['photo_url'],'isMe':x['uid']==uid,'isAdmin':x['isAdmin']} for i,x in enumerate(ranked[:100])]
             persist();return {'top':top,'myRank':my_rank,'myScore':int(max(0,p['balance'])),'total':len(ranked)}
         elif action=='state': pass
         elif action=='invoice':
